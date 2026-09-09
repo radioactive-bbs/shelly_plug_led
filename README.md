@@ -122,6 +122,10 @@ Shelly's Plug PM family (Gen3, and presumably Gen4 once it ships — no official
 
 Originally created by **[@ishiharas](https://github.com/ishiharas)** — see the upstream project at [ishiharas/shelly_plug_led](https://github.com/ishiharas/shelly_plug_led). This fork ([@radioactive-bbs](https://github.com/radioactive-bbs)) builds on that work to add Shelly Power Strip (Gen4) support, independent on/off color entities, and several reliability/security hardening fixes. See [Releases](https://github.com/radioactive-bbs/shelly_plug_led/releases) for the full change history.
 
+### Development
+
+Development on this fork is supported by **Claude** (Anthropic) as an AI coding assistant. Every change goes through a dedicated review pass focused on security (credential handling, input sanitization, auth flows) and clean, maintainable code, plus its own test/verification pass before merging — not just a bulk commit. Where something can't be verified against real hardware (see e.g. the [Plug PM caveat](#plug-pm-caveat)), that's called out explicitly rather than presented as confirmed.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
