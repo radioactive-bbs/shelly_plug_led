@@ -6,9 +6,9 @@
   <a href="https://github.com/radioactive-bbs/shelly_plug_led/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License"></a>
 </p>
 
-> This is a fork of the original **[shelly_plug_led](https://github.com/ishiharas/shelly_plug_led)** by **[@ishiharas](https://github.com/ishiharas)** — all credit for the original design and implementation goes to them. This fork adds **Shelly Power Strip (Gen4)** support, independent on/off color control, and a number of reliability fixes on top of it.
+> This is a fork of the original **[shelly_plug_led](https://github.com/ishiharas/shelly_plug_led)** by **[@ishiharas](https://github.com/ishiharas)** — all credit for the original design and implementation goes to them. This fork adds **Shelly Power Strip (Gen4)** and **Shelly Plug PM (Gen3 / Gen4)** support, independent on/off color control, and a number of reliability fixes on top of it.
 
-A custom Home Assistant integration that turns the built-in RGB LED(s) of your **Shelly Plug S (Gen2 / Gen3)** or **Shelly Power Strip (Gen4)** devices into independent, fully controllable smart light entities — **without affecting the operational on/off power state of the actual smart plug/outlet relay(s)**.
+A custom Home Assistant integration that turns the built-in RGB LED(s) of your **Shelly Plug S (Gen2 / Gen3)**, **Shelly Plug PM (Gen3 / Gen4)**, or **Shelly Power Strip (Gen4)** devices into independent, fully controllable smart light entities — **without affecting the operational on/off power state of the actual smart plug/outlet relay(s)**.
 
 <p align="center">
   <img src="screenshots/controls.png" alt="LED Ring On Color and Off Color toggles on the device's control card" width="380">
@@ -36,6 +36,8 @@ Shelly Gen2/Gen3/Gen4 devices already expose their status-LED configuration over
 | Device family | Generation | Notes |
 |---|---|---|
 | Shelly Plug S | Gen2 / Gen3 | Local RPC (`PLUGS_UI` component) |
+| Shelly Plug US | Gen4 | Local RPC (`PLUGS_UI` component) |
+| Shelly Plug PM | Gen3 / Gen4 | Local RPC (`PLUGPM_UI` component) — **untested on real hardware, see the [Plug PM caveat](#plug-pm-caveat)** |
 | Shelly Power Strip 4 | Gen4 | Local RPC (`POWERSTRIP_UI` component) — see the [Power Strip caveat](#power-strip-caveat) |
 
 Any device must already be set up and reachable through the **official built-in Shelly integration** (local RPC, not cloud-only/BLE-only setups) before it can be added here.
@@ -97,6 +99,12 @@ Because the color mapping is written straight to the device's own `leds` config,
 On a Shelly Power Strip Gen4 (firmware 2.0.0, confirmed by testing against real hardware), the device only exposes **one shared** on/off color slot for the whole strip, not one per physical outlet, even though it has 4 individually switchable relays. In practice this doesn't stop per-outlet red/on-green/off from working: **each outlet's own LED independently tracks its own relay's state** using that one shared color pair, confirmed by testing — so setting on=red / off=green once still makes outlet 1's LED show red exactly when outlet 1 is on, independent of the other 3 outlets. Only the *color choice itself* isn't independently configurable per outlet on current firmware — if Shelly ships a firmware update that exposes `switch:1`..`switch:3` color slots individually, this integration will automatically create one on/off pair per outlet without any changes needed (it already discovers outlets dynamically from the device's own config).
 
 The LED **mode** (off / power-tracking / switch) is also a single firmware-wide setting — the **Reset LEDs to Default** button resets it for the whole device, not per outlet or per color slot.
+
+### Plug PM caveat
+
+Shelly's Plug PM family (Gen3, and presumably Gen4 once it ships — no official documentation was available for a Gen4 Plug PM at the time this was written) exposes its LED config through a different RPC component (`PLUGPM_UI`, keyed as `pm1:0`) than the Plug S/Plug US family (`PLUGS_UI`, keyed as `switch:0`) — this integration now probes for both, so a Plug PM should be picked up automatically.
+
+**This has not been verified against real Plug PM hardware.** Specifically, Shelly's own API documentation for `PLUGPM_UI.GetConfig` only shows an `on` color slot in its example, not the `on`/`off` pair the Plug S/Power Strip families expose — it's unclear whether that's just a non-exhaustive example or an actual hardware limitation (a plug that can only track "LED on while powered", not a separate off-color). If you own a Plug PM and the **On Color** entity works but **Off Color** doesn't (or vice versa), please open an issue — that'll pin down which it is.
 
 ---
 

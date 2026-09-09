@@ -14,17 +14,19 @@ from .api import ShellyAuthError
 DOMAIN = "shelly_plug_led"
 _LOGGER = logging.getLogger(__name__)
 
-# Matches the per-outlet keys Shelly uses inside ``leds.colors``
-# (e.g. "switch:0" .. "switch:3" on a Power Strip). Other keys such as
-# "power" (the power-tracking-mode brightness) are ignored.
-_SWITCH_KEY_RE = re.compile(r"^switch:(\d+)$")
+# Matches the per-outlet keys Shelly uses inside ``leds.colors``: "switch:0"
+# .. "switch:3" on a Plug S / Plug US / Power Strip, "pm1:0" on the
+# power-metering plug family (Plug PM Gen3/Gen4, PLUGPM_UI - see api.py).
+# Other keys such as "power" (the power-tracking-mode brightness) are
+# ignored.
+_SWITCH_KEY_RE = re.compile(r"^(switch|pm1):(\d+)$")
 
 
 def _discover_switch_keys(coordinator_data: dict | None) -> list[str]:
-    """Return the sorted ``switch:N`` keys present in the LED color config."""
+    """Return the sorted outlet keys present in the LED color config."""
     colors = (coordinator_data or {}).get("leds", {}).get("colors", {})
     keys = [key for key in colors if _SWITCH_KEY_RE.match(key)]
-    keys.sort(key=lambda key: int(_SWITCH_KEY_RE.match(key).group(1)))
+    keys.sort(key=lambda key: int(_SWITCH_KEY_RE.match(key).group(2)))
     return keys or ["switch:0"]  # Fall back to the single-outlet default.
 
 
@@ -45,7 +47,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
     entities = []
     for switch_key in switch_keys:
-        index = int(_SWITCH_KEY_RE.match(switch_key).group(1))
+        index = int(_SWITCH_KEY_RE.match(switch_key).group(2))
         if multi:
             ring_label = f"LED Outlet {index + 1}"
             base_suffix = f"led_{switch_key.replace(':', '_')}"

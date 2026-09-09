@@ -28,10 +28,16 @@ TIMEOUT = 5
 
 # RPC components that expose LED configuration, tried in this order until one
 # answers. ``PLUGS_UI`` covers single-outlet devices (Shelly Plug S Gen2/Gen3,
-# ...); ``POWERSTRIP_UI`` covers multi-outlet devices (Shelly Power Strip
-# Gen4, with switch:0..switch:3). Both share the same ``leds.colors`` /
+# Plug US Gen4, ...); ``POWERSTRIP_UI`` covers multi-outlet devices (Shelly
+# Power Strip Gen4, with switch:0..switch:3); ``PLUGPM_UI`` covers the
+# power-metering plug family (Shelly Plug PM Gen3/Gen4), which - despite
+# sharing the same ``leds.mode``/``leds.colors`` shape - is exposed under its
+# own RPC method name and keys its per-outlet color slot as ``pm1:0`` rather
+# than ``switch:0`` (Shelly's Gen3/Gen4 firmware is not consistent about
+# this: the Plug US Gen4, which also has power metering, still uses
+# ``PLUGS_UI``/``switch:0``). All three share the same ``leds.colors`` /
 # ``leds.mode`` config shape, just keyed by a different set of RPC methods.
-LED_UI_COMPONENTS = ("PLUGS_UI", "POWERSTRIP_UI")
+LED_UI_COMPONENTS = ("PLUGS_UI", "POWERSTRIP_UI", "PLUGPM_UI")
 
 
 class ShellyAuthError(Exception):
