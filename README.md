@@ -102,7 +102,7 @@ The LED **mode** (off / power-tracking / switch) is also a single firmware-wide 
 
 ### Plug PM caveat
 
-Shelly's Plug PM family (Gen3, and presumably Gen4 once it ships — no official documentation was available for a Gen4 Plug PM at the time this was written) exposes its LED config through a different RPC component (`PLUGPM_UI`, keyed as `pm1:0`) than the Plug S/Plug US family (`PLUGS_UI`, keyed as `switch:0`) — this integration now probes for both, so a Plug PM should be picked up automatically.
+Shelly's Plug PM family (Gen3, and presumably Gen4 once it ships — no official documentation was available for a Gen4 Plug PM at the time this was written) exposes its LED config through a different RPC component (`PLUGPM_UI`, keyed as `pm1:0`) than the Plug S/Plug US family (`PLUGS_UI`, keyed as `switch:0`) — this integration probes for both (since v1.6.0), so a Plug PM should be picked up automatically.
 
 **This has not been verified against real Plug PM hardware.** Specifically, Shelly's own API documentation for `PLUGPM_UI.GetConfig` only shows an `on` color slot in its example, not the `on`/`off` pair the Plug S/Power Strip families expose — it's unclear whether that's just a non-exhaustive example or an actual hardware limitation (a plug that can only track "LED on while powered", not a separate off-color). If you own a Plug PM and the **On Color** entity works but **Off Color** doesn't (or vice versa), please open an issue — that'll pin down which it is.
 
